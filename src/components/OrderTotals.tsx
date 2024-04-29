@@ -4,21 +4,22 @@ import { formatCurrency } from "../helpers";
 
 type orderTotalProps = {
   order: OrderItem[];
+  tip: number;
+  placeOrder: () => void;
 };
 
-export default function OrderTotals({ order }: orderTotalProps) {
+export default function OrderTotals({ order, tip, placeOrder }: orderTotalProps) {
   const subtotalAmounts = useMemo(
     () => order.reduce((total, item) => total + item.quantity * item.price, 0),
     [order]
-  );
-  const tipAmount = useMemo(() => subtotalAmounts * 0.1, [subtotalAmounts]);
-  
+  );  
+  const tipAmount = useMemo(() => subtotalAmounts * tip, [tip, order]);
+
   const totalAmount = useMemo(
     () => subtotalAmounts + tipAmount,
     [subtotalAmounts, tipAmount]
   );
 
- 
   return (
     <>
       <div className="space-y-3">
@@ -36,9 +37,11 @@ export default function OrderTotals({ order }: orderTotalProps) {
           <span className="font-bold">{formatCurrency(totalAmount)}</span>
         </p>
       </div>
-      <button 
-        onClick={() => window.location.reload()}
-      className="bg-teal-400 p-2 rounded-lg text-white font-bold hover:bg-teal-500 w-full">
+      <button
+        onClick={placeOrder}
+        disabled={totalAmount === 0}
+        className="bg-teal-400 p-2 rounded-lg disabled:opacity-65 disabled:hover:bg-teal-400 text-white font-bold hover:bg-teal-500 w-full"
+      >
         Reiniciar orden
       </button>
     </>
